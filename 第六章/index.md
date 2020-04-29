@@ -53,3 +53,154 @@
 是HTTP/1.1版本以前历史遗留字段.
 >pragma: no-cache  
 在中间服务器如果不能以HTTP/1.1位基准时的处理方案
+
+### 6.4.1 Accept
+可以通知服务器,用户代理能够处理的媒体类型
+>Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8  
+
+文件类型|值
+-------|---------
+|文本文件|text/html, text/plain, text/css,application/xhtml+xml, application/xml|
+|图片文件|image/jpeg, image/gif, image/png ...|
+|视频文件|video/mpeg, video/quicktime ...|
+|应用程序使用的二进制文件|application/octet-stream, application/zip ...|
+
+>若想要给显示的媒体类型增加优先级，则使用 q= 来额外表示权重值 1，用分号（;）进行分隔。权重值 q 的范围是 0~1（可精确到小数点 后 3 位），且 1 为最大值。不指定权重 q 值时，默认权重为 q=1.0。
+
+### 6.4.2 Accept-Charset
+> Accept-Charset 首部字段可用来通知服务器用户代理支持的字符集及 字符集的相对优先顺序。另外，可一次性指定多种字符集。与首部字 段 Accept 相同的是可用权重 q 值来表示相对优先级。
+ 
+### 6.4.3 Accept-Encoding
+Accept-Encoding 首部字段用来告知服务器用户代理支持的内容编码及 内容编码的优先级顺序。可一次性指定多种内容编码。
+
+类型|值
+----|---
+gzip | 由文件压缩程序 gzip（GNU zip）生成的编码格式 （RFC1952），采用 Lempel-Ziv 算法（LZ77）及 32 位循环冗余 校验（Cyclic Redundancy Check，通称 CRC）。
+compress|由 UNIX 文件压缩程序 compress 生成的编码格式，采用 Lempel- Ziv-Welch 算法（LZW）。
+deflate | 组合使用 zlib 格式（RFC1950）及由 deflate 压缩算法 （RFC1951）生成的编码格式。
+identity | 不执行压缩或不会变化的默认编码格式
+
+> 采用权重 q 值来表示相对优先级，这点与首部字段 Accept 相同。另 外，也可使用星号（*）作为通配符，指定任意的编码格式。
+
+### 6.4.4 Accept-Language
+
+> Accept-Language: zh-cn,zh;q=0.7,en-us,en;q=0.3
+
+首部字段 Accept-Language 用来告知服务器用户代理能够处理的自然 语言集（指中文或英文等），以及自然语言集的相对优先级。可一次 指定多种自然语言集。 和 Accept 首部字段一样，按权重值 q 来表示相对优先级。
+
+### 6.4.5 Authorization
+
+> Authorization: Basic dWVub3NlbjpwYXNzd29yZA==
+
+首部字段 Authorization 是用来告知服务器，用户代理的认证信息（证 书值）。通常，想要通过服务器认证的用户代理会在接收到返回的 401 状态码响应后，把首部字段 Authorization 加入请求中。共用缓存 在接收到含有 Authorization 首部字段的请求时的操作处理会略有差 异
+
+### 6.4.6 Expect
+> Expect: 100-continu
+
+客户端使用首部字段 Expect 来告知服务器，期望出现的某种特定行 为。因服务器无法理解客户端的期望作出回应而发生错误时，会返回状态码 417 Expectation Failed。   
+
+客户端可以利用该首部字段，写明所期望的扩展。虽然 HTTP/1.1 规范只定义了 100-continue（状态码 100 Continue 之意）。
+
+### 6.4.7 From
+
+首部字段 From 用来告知服务器使用用户代理的用户的电子邮件地址。通常，其使用目的就是为了显示搜索引擎等用户代理的负责人的 电子邮件联系方式。使用代理时，应尽可能包含 From 首部字段（但可能会因代理不同，将电子邮件地址记录在 User-Agent 首部字段内）。
+
+### 6.4.8 Host
+> Host: www.hackr.jp
+
+首部字段 Host 会告知服务器，请求的资源所处的互联网主机名和端口号。Host 首部字段在 HTTP/1.1 规范内是唯一一个必须被包含在请求内的首部字段。  
+
+首部字段 Host 和以单台服务器分配多个域名的虚拟主机的工作机制有很密切的关联，这是首部字段 Host 必须存在的意义。   
+
+请求被发送至服务器时，请求中的主机名会用 IP 地址直接替换解决。但如果这时，相同的 IP 地址下部署运行着多个域名，那么服务器就会无法理解究竟是哪个域名对应的请求。因此，就需要使用首部字段 Host 来明确指出请求的主机名。若服务器未设定主机名，那直接发送一个空值即可。
+
+### 6.4.9 If-Match
+形如 If-xxx 这种样式的请求首部字段，都可称为条件请求。服务器接收到附带条件的请求后，只有判断指定条件为真时，才会执行请求。
+
+### 6.4.10 If-Modified-Since
+> If-Modified-Since: Thu, 15 Apr 2004 00:00:00 GMT  
+
+首部字段 If-Modified-Since，属附带条件之一，它会告知服务器若If- Modified-Since 字段值早于资源的更新时间，则希望能处理该请求。而在指定 If-Modified-Since字段值的日期时间之后，如果请求的资源都没有过更新，则返回状态码 304 Not Modified 的响应。  
+
+If-Modified-Since 用于确认代理或客户端拥有的本地资源的有效性。获取资源的更新日期时间，可通过确认首部字段 Last-Modified 来确定。
+
+### 6.4.11 If-None-Match
+
+首部字段 If-None-Match 属于附带条件之一。它和首部字段 If-Match 作用相反。用于指定 If-None-Match 字段值的实体标记（ETag）值与请求资源的 ETag 不一致时，它就告知服务器处理该请求。  
+
+在 GET 或 HEAD 方法中使用首部字段 If-None-Match 可获取最新的资源。因此，这与使用首部字段 If-Modified-Since 时有些类似。
+
+### 6.4.12 If-Range
+
+首部字段 If-Range 属于附带条件之一。它告知服务器若指定的 If- Range 字段值（ETag 值或者时间）和请求资源的 ETag 值或时间相一致时，则作为范围请求处理。反之，则返回全体资源。
+
+>下面我们思考一下不使用首部字段 If-Range 发送请求的情况。服务器端的资源如果更新，那客户端持有资源中的一部分也会随之无效，当然，范围请求作为前提是无效的。这时，服务器会暂且以状态码 412 Precondition Failed 作为响应返回，其目的是催促客户端再次发送请求。这样一来，与使用首部字段 If-Range 比起来，就需要花费两倍的功夫。
+
+### 6.4.13 If-Unmodified-Since
+
+> If-Unmodified-Since: Thu, 03 Jul 2012 00:00:00 GMT
+
+首部字段 If-Unmodified-Since 和首部字段 If-Modified-Since 的作用相反。它的作用的是告知服务器，指定的请求资源只有在字段值内指定的日期时间之后，未发生更新的情况下，才能处理请求。如果在指定日期时间后发生了更新，则以状态码 412 Precondition Failed 作为响应返回。
+
+### 6.4.14 Max-Forwards
+
+> Max-Forwards: 10
+
+通过 TRACE 方法或 OPTIONS 方法，发送包含首部字段 Max- Forwards 的请求时，该字段以十进制整数形式指定可经过的服务器最大数目。服务器在往下一个服务器转发请求之前，Max-Forwards 的值减 1 后重新赋值。当服务器接收到 Max-Forwards 值为 0 的请求时，则不再进行转发，而是直接返回响应。
+
+使用 HTTP 协议通信时，请求可能会经过代理等多台服务器。途中，如果代理服务器由于某些原因导致请求转发失败，客户端也就等不到服务器返回的响应了。对此，我们无从可知。
+
+可以灵活使用首部字段 Max-Forwards，针对以上问题产生的原因展开调查。由于当 Max-Forwards 字段值为 0 时，服务器就会立即返回响应，由此我们至少可以对以那台服务器为终点的传输路径的通信状况有所把握。
+
+### 6.4.15 Proxy-Authorization
+> Proxy-Authorization: Basic dGlwOjkpNLAGfFY5
+
+接收到从代理服务器发来的认证质询时，客户端会发送包含首部字段 Proxy-Authorization 的请求，以告知服务器认证所需要的信息。
+
+这个行为是与客户端和服务器之间的 HTTP 访问认证相类似的，不同之处在于，认证行为发生在客户端与代理之间。客户端与服务器之间的认证，使用首部字段 Authorization 可起到相同作用。
+
+### 6.4.16 Range
+> Range: bytes=5001-10000
+
+
+对于只需获取部分资源的范围请求，包含首部字段 Range 即可告知服务器资源的指定范围。上面的示例表示请求获取从第 5001 字节至第 10000 字节的资源。
+
+接收到附带 Range 首部字段请求的服务器，会在处理请求之后返回状态码为 206 Partial Content 的响应。无法处理该范围请求时，则会返回状态码 200 OK 的响应及全部资源。
+
+### 6.4.17 Referer
+> Referer: http://www.hackr.jp/index.htm
+
+首部字段 Referer 会告知服务器请求的原始资源的 URI。
+
+客户端一般都会发送 Referer 首部字段给服务器。但当直接在浏览器的地址栏输入 URI，或出于安全性的考虑时，也可以不发送该首部字段。
+
+因为原始资源的 URI 中的查询字符串可能含有 ID 和密码等保密信息，要是写进 Referer 转发给其他服务器，则有可能导致保密信息的泄露。
+
+### 6.4.18 TE
+> TE: gzip, deflate;q=0.5
+
+首部字段 TE 会告知服务器客户端能够处理响应的传输编码方式及相对优先级。它和首部字段 Accept-Encoding 的功能很相像，但是用于传输编码。
+
+### 6.4.19 User-Agent
+> User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:13.0) Gecko/20100101 Firefox/13.0.1
+
+首部字段 User-Agent 会将创建请求的浏览器和用户代理名称等信息传达给服务器。
+
+由网络爬虫发起请求时，有可能会在字段内添加爬虫作者的电子邮件地址。此外，如果请求经过代理，那么中间也很可能被添加上代理服务器的名称。
+
+## 6.5 响应首部字段
+响应首部字段是由服务器端向客户端返回响应报文中所使用的字段， 用于补充响应的附加信息、服务器信息，以及对客户端的附加要求等 信息。
+
+### 6.5.1 Accept-Ranges
+> Accept-Ranges: bytes
+
+首部字段 Accept-Ranges 是用来告知客户端服务器是否能处理范围请 求，以指定获取服务器端某个部分的资源。
+
+可指定的字段值有两种，可处理范围请求时指定其为 bytes，反之则 指定其为 none。
+
+### 6.5.2 Age
+> Age: 600
+
+首部字段 Age 能告知客户端，源服务器在多久前创建了响应。字段值的单位为秒。
+
+若创建该响应的服务器是缓存服务器，Age 值是指缓存后的响应再次 发起认证到认证完成的时间值。代理创建响应时必须加上首部字段 Age。
