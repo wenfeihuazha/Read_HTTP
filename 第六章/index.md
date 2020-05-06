@@ -203,4 +203,201 @@ If-Modified-Since 用于确认代理或客户端拥有的本地资源的有效�
 
 首部字段 Age 能告知客户端，源服务器在多久前创建了响应。字段值的单位为秒。
 
-若创建该响应的服务器是缓存服务器，Age 值是指缓存后的响应再次 发起认证到认证完成的时间值。代理创建响应时必须加上首部字段 Age。
+若创建该响应的服务器是缓存服务器，Age 值是指缓存后的响应再次 发起认证到认证完成的时间值。代理创建响应时必须加上首部字段 Age。 
+
+### 6.5.3 ETag
+>ETag: "82e22293907ce725faf67773957acd12"  
+
+首部字段 ETag 能告知客户端实体标识。它是一种可将资源以字符串 形式做唯一性标识的方式。服务器会为每份资源分配对应的 ETag 值。  
+
+另外，当资源更新时，ETag 值也需要更新。生成 ETag 值时，并没有 统一的算法规则，而仅仅是由服务器来分配。
+
+### 6.5.4 Location
+
+> Location: http://www.usagidesign.jp/sample.html
+
+使用首部字段 Location 可以将响应接收方引导至某个与请求 URI 位置不同的资源。  
+
+基本上，该字段会配合 3xx ：Redirection 的响应，提供重定向的 URI。 
+
+几乎所有的浏览器在接收到包含首部字段 Location 的响应后，都会强 制性地尝试对已提示的重定向资源的访问。
+
+### 6.5.5 Proxy-Authenticate
+> Proxy-Authenticate: Basic realm="Usagidesign Auth"
+
+首部字段 Proxy-Authenticate 会把由代理服务器所要求的认证信息发送 给客户端。  
+
+它与客户端和服务器之间的 HTTP 访问认证的行为相似，不同之处在于其认证行为是在客户端与代理之间进行的。而客户端与服务器之间进行认证时，首部字段 WWW-Authorization 有着相同的作用。有关 HTTP 访问认证，后面的章节会再进行详尽阐述。
+
+### 6.5.6 Retry-Afte
+
+> Retry-After: 120  
+
+首部字段 Retry-After 告知客户端应该在多久之后再次发送请求。主要配合状态码 503 Service Unavailable 响应，或 3xx Redirect 响应一起使用。  
+
+字段值可以指定为具体的日期时间（Wed, 04 Jul 2012 06：34：24 GMT 等格式），也可以是创建响应后的秒数。
+
+### 6.5.7 Server
+> Server: Apache/2.2.17 (Unix)
+
+首部字段 Server 告知客户端当前服务器上安装的 HTTP 服务器应用程序的信息。不单单会标出服务器上的软件应用名称，还有可能包括版本号和安装时启用的可选项。
+
+> Server: Apache/2.2.6 (Unix) PHP/5.2.5
+
+### 6.5.8 Vary
+
+> Vary: Accept-Language
+
+首部字段 Vary 可对缓存进行控制。源服务器会向代理服务器传达关于本地缓存使用方法的命令。  
+从代理服务器接收到源服务器返回包含 Vary 指定项的响应之后，若再要进行缓存，仅对请求中含有相同 Vary 指定首部字段的请求返回缓存。即使对相同资源发起请求，但由于 Vary 指定的首部字段不相同，因此必须要从源服务器重新获取资源。
+
+### 6.5.9 WWW-Authenticate
+
+> WWW-Authenticate: Basic realm="Usagidesign Auth"
+
+首部字段 WWW-Authenticate 用于 HTTP 访问认证。它会告知客户端适用于访问请求 URI 所指定资源的认证方案（Basic 或是 Digest）和带参数提示的质询（challenge）。状态码 401 Unauthorized 响应中，肯定带有首部字段 WWW-Authenticate。
+
+## 6.6 实体首部字段
+
+实体首部字段是包含在请求报文和响应报文中的实体部分所使用的首部，用于补充内容的更新时间等与实体相关的信息。
+
+### 6.6.1 Allow
+> Allow: GET, HEAD  
+
+首部字段 Allow 用于通知客户端能够支持 Request-URI 指定资源的所有 HTTP 方法。当服务器接收到不支持的 HTTP 方法时，会以状态码 405 Method Not Allowed 作为响应返回。与此同时，还会把所有能支持的 HTTP 方法写入首部字段 Allow 后返回。
+
+### 6.6.2 Content-Encoding
+> Content-Encoding: gzip
+
+首部字段 Content-Encoding 会告知客户端服务器对实体的主体部分选用的内容编码方式。内容编码是指在不丢失实体信息的前提下所进行的压缩。
+
+主要采用以下 4 种内容编码的方式。（各方式的说明请参考 6.4.3 节 Accept-Encoding 首部字段）。
+> *gzip
+> *compress
+> *deflate
+> *identity
+
+### 6.6.3 Content-Language
+> Content-Language: zh-CN
+
+首部字段 Content-Language 会告知客户端，实体主体使用的自然语言 （指中文或英文等语言）。
+
+### 6.6.4 Content-Length
+
+> Content-Length: 15000
+
+首部字段 Content-Length 表明了实体主体部分的大小（单位是字节）。对实体主体进行内容编码传输时，不能再使用 Content-Length 首部字段。由于实体主体大小的计算方法略微复杂，所以在此不再展开。读者若想一探究竟，可参考 RFC2616 的 4.4。
+
+### 6.6.5 Content-Location
+> Content-Location: http://www.hackr.jp/index-ja.html
+
+首部字段 Content-Location 给出与报文主体部分相对应的 URI。和首部字段 Location 不同，Content-Location 表示的是报文主体返回资源对应的 URI。
+
+### 6.6.6 Content-MD5
+
+> Content-MD5: OGFkZDUwNGVhNGY3N2MxMDIwZmQ4NTBmY2IyTY==
+
+首部字段 Content-MD5 是一串由 MD5 算法生成的值，其目的在于检 查报文主体在传输过程中是否保持完整，以及确认传输到达。 
+
+对报文主体执行 MD5 算法获得的 128 位二进制数，再通过 Base64 编码后将结果写入 Content-MD5 字段值。由于 HTTP 首部无法记录二进制值，所以要通过 Base64 编码处理。为确保报文的有效性，作为接收方的客户端会对报文主体再执行一次相同的 MD5 算法。计算出的值与字段值作比较后，即可判断出报文主体的准确性。 
+
+采用这种方法，对内容上的偶发性改变是无从查证的，也无法检测出恶意篡改。其中一个原因在于，内容如果能够被篡改，那么同时意味着 Content-MD5 也可重新计算然后被篡改。所以处在接收阶段的客户端是无法意识到报文主体以及首部字段 Content-MD5 是已经被篡改过的。
+
+### 6.6.7 Content-Range
+
+> Content-Range: bytes 5001-10000/10000
+
+针对范围请求，返回响应时使用的首部字段 Content-Range，能告知客户端作为响应返回的实体的哪个部分符合范围请求。字段值以字节为单位，表示当前发送部分及整个实体大小。
+
+### 6.6.8 Content-Type
+
+> Content-Type: text/html; charset=UTF-8
+
+首部字段 Content-Type 说明了实体主体内对象的媒体类型。和首部字段 Accept 一样，字段值用 type/subtype 形式赋值。
+
+### 6.6.9 Expires
+
+> Expires: Wed, 04 Jul 2012 08:26:05 GM
+
+首部字段 Expires 会将资源失效的日期告知客户端。缓存服务器在接收到含有首部字段 Expires 的响应后，会以缓存来应答请求，在 Expires 字段值指定的时间之前，响应的副本会一直被保存。当超过指定的时间后，缓存服务器在请求发送过来时，会转向源服务器请求资源。
+
+源服务器不希望缓存服务器对资源缓存时，最好在 Expires 字段内写入与首部字段 Date 相同的时间值。
+
+但是，当首部字段 Cache-Control 有指定 max-age 指令时，比起首部字段 Expires，会优先处理 max-age 指令。
+
+### 6.6.10 Last-Modified
+> Last-Modified: Wed, 23 May 2012 09:59:55 GMT
+
+首部字段 Last-Modified 指明资源最终修改的时间。一般来说，这个值就是 Request-URI 指定资源被修改的时间。但类似使用 CGI 脚本进行动态数据处理时，该值有可能会变成数据最终修改时的时间。
+
+## 6.7 为 Cookie 服务的首部字段
+
+Cookie 的工作机制是用户识别及状态管理。Web 网站为了管理用户的状态会通过 Web 浏览器，把一些数据临时写入用户的计算机内。接着当用户访问该Web网站时，可通过通信方式取回之前发放的 Cookie。
+
+调用 Cookie 时，由于可校验 Cookie 的有效期，以及发送方的域、路径、协议等信息，所以正规发布的 Cookie 内的数据不会因来自其他 Web 站点和攻击者的攻击而泄露。
+
+### 至 2013 年 5 月，Cookie 的规格标准文档有以下 4 种。
+
+由网景公司颁布的规格标准
+> 网景通信公司设计并开发了 Cookie，并制定相关的规格标准。1994 年前后，Cookie 正式应用在网景浏览器中。目前最为普及的 Cookie 方式也是以此为基准的。
+
+RFC2109
+
+> 某企业尝试以独立技术对 Cookie 规格进行标准化统筹。原本的意图是想和网景公司制定的标准交互应用，可惜发生了微妙的差异。现在该标准已淡出了人们的视线。
+
+RFC2965
+> 为终结 Internet Explorer 浏览器与 Netscape Navigator 的标准差异而导致的浏览器战争，RFC2965 内定义了新的 HTTP 首部 Set-Cookie2 和 Cookie2。可事实上，它们几乎没怎么投入使用。
+
+RFC6265
+> 将网景公司制定的标准作为业界事实标准（De facto standard），重新定义 Cookie 标准后的产物。
+
+目前使用最广泛的 Cookie 标准却不是 RFC 中定义的任何一个。而是在网景公司制定的标准上进行扩展后的产物。
+
+### 6.7.1 Set-Cookie
+
+> Set-Cookie: status=enable; expires=Tue, 05 Jul 2011 07:26:31 GMT; path=/; domain=.hackr.jp;
+
+
+|属性|说明|
+|:---:|----:|
+|NAME=VALUE|赋予 Cookie 的名称和其值（必需项）|
+|expires=DATE|Cookie 的有效期（若不明确指定则默认为浏览器关闭前为止）|
+|path=PATH|将服务器上的文件目录作为Cookie的适用对象（若不指定则默认为文档所在的文件目录）|
+|domain=域名|作为 Cookie 适用对象的域名（若不指定则默认为创建 Cookie 的服务器的域名）|
+|Secure|仅在 HTTPS 安全通信时才会发送 Cookie|
+|HttpOnly|加以限制，使 Cookie 不能被 JavaScript 脚本访问|
+
+### 6.7.2 Cookie
+> Cookie: status=enable
+
+首部字段 Cookie 会告知服务器，当客户端想获得 HTTP 状态管理支 持时，就会在请求中包含从服务器接收到的 Cookie。接收到多个 Cookie 时，同样可以以多个 Cookie 形式发送。
+
+## 6.8 其他首部字段
+
+HTTP 首部字段是可以自行扩展的。所以在 Web 服务器和浏览器的应用上，会出现各种非标准的首部字段。
+
+### 6.8.1 X-Frame-Options
+
+> X-Frame-Options: DENY
+
+首部字段 X-Frame-Options 属于 HTTP 响应首部，用于控制网站内容在其他 Web 网站的 Frame 标签内的显示问题。其主要目的是为了防止点击劫持（clickjacking）攻击。
+
+### 6.8.2 X-XSS-Protection
+
+> X-XSS-Protection: 1
+
+首部字段 X-XSS-Protection 属于 HTTP 响应首部，它是针对跨站脚本攻击（XSS）的一种对策，用于控制浏览器 XSS 防护机制的开关。
+
+### 6.8.3 DNT
+> DNT: 1
+
+首部字段 DNT 属于 HTTP 请求首部，其中 DNT 是 Do Not Track 的简称，意为拒绝个人信息被收集，是表示拒绝被精准广告追踪的一种方法。
+
+首部字段 DNT 可指定的字段值如下。  
+* 0 ：同意被追踪
+* 1 ：拒绝被追踪
+
+### 6.8.4 P3P
+> P3P: CP="CAO DSP LAW CURa ADMa DEVa TAIa PSAa PSDa IVAa IVDa OUR BUS IND UNI COM NAV INT"
+
+首部字段 P3P 属于 HTTP 相应首部，通过利用 P3P（The Platform for Privacy Preferences，在线隐私偏好平台）技术，可以让 Web 网站上 的个人隐私变成一种仅供程序可理解的形式，以达到保护用户隐私的目的。
